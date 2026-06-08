@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "0UhMGgIiPsqWlT0f9jfVg"
+uri = "file://sample_lightcurve.csv"
+type = "table"
+title = "sample_lightcurve.csv — real Kepler light curve (exoplanet host)"
