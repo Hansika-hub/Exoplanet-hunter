@@ -95,8 +95,8 @@ def load_samples():
             flux = flux_array[i].tolist()
             if labels_array is not None:
                 raw_label = int(labels_array[i]) if labels_array.ndim == 1 else int(labels_array[i][0])
-                # Kepler dataset: label 2 = exoplanet, label 1 = non-exoplanet
-                is_exo = raw_label == 2
+                # Dataset labels: 1 = exoplanet, 0 = non-exoplanet
+                is_exo = raw_label == 1
                 label = "EXOPLANET" if is_exo else "NON-EXOPLANET"
             else:
                 label = "UNKNOWN"
