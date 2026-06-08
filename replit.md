@@ -1,6 +1,6 @@
-# [Project name]
+# Exoplanet Hunter
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A web app that uses a CNN trained on NASA Kepler's dataset to classify stars as exoplanet hosts or non-hosts from stellar light curves.
 
 ## Run & Operate
 
@@ -22,15 +22,27 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `python-backend/app.py` — FastAPI service; loads CNN, serves /predict, /samples, /model-status
+- `python-backend/cnn_exoplanets.keras` — Keras CNN model (3197 flux inputs → sigmoid binary output)
+- `python-backend/sample_lightcurves.npz` — 570 Kepler light curves with exoplanet labels
+- `lib/api-spec/openapi.yaml` — API contract source of truth
+- `artifacts/api-server/src/routes/model.ts` — Express proxy routes to Python backend
+- `artifacts/exoplanet-hunter/src/` — React + Vite frontend
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Python FastAPI (port 8000) is NOT exposed via the reverse proxy — Express at `/api` proxies to it using Node's built-in `fetch`
+- CNN input normalization happens in Python: zero-mean, unit-variance per sample; pad/truncate to 3197
+- Output shape (None, 1) = sigmoid binary; class 1 = exoplanet
+- Light curves are downsampled to ~400 points client-side before rendering in Recharts
+- Model files loaded via `model_setup.py` path registry (local files only, no HuggingFace Hub)
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Upload a Kepler light curve (.csv) or click a preloaded sample to get an instant exoplanet prediction
+- CNN confidence bar + probability breakdown for EXOPLANET / NON-EXOPLANET
+- Light curve rendered as a Recharts line chart
+- Rotating fun facts panel about the Kepler mission and exoplanet discovery
 
 ## User preferences
 

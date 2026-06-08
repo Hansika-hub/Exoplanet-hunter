@@ -3,13 +3,15 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Exoplanet Hunter API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: model
+    description: Model prediction operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,65 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /predict:
+    post:
+      operationId: predict
+      tags: [model]
+      summary: Predict exoplanet
+      description: Classify a light curve as exoplanet or non-exoplanet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PredictInput"
+      responses:
+        "200":
+          description: Prediction result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PredictResult"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: Model not ready
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /samples:
+    get:
+      operationId: getSamples
+      tags: [model]
+      summary: Get sample light curves
+      description: Returns pre-loaded sample light curves from the Kepler dataset
+      responses:
+        "200":
+          description: List of sample light curves
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SampleLightCurve"
+  /model-status:
+    get:
+      operationId: getModelStatus
+      tags: [model]
+      summary: Get model loading status
+      description: Returns whether the model is ready for inference
+      responses:
+        "200":
+          description: Model status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModelStatus"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +94,76 @@ components:
           type: string
       required:
         - status
-
+    PredictInput:
+      type: object
+      required:
+        - flux
+      properties:
+        flux:
+          type: array
+          items:
+            type: number
+          description: Flux values from the light curve (3197 values expected)
+        label:
+          type: ["string", "null"]
+          description: Optional label for the sample (for display purposes)
+    PredictResult:
+      type: object
+      required:
+        - label
+        - confidence
+        - is_exoplanet
+        - probabilities
+      properties:
+        label:
+          type: string
+          description: "Predicted label: EXOPLANET or NON-EXOPLANET"
+        confidence:
+          type: number
+          description: Confidence of the prediction (0-1)
+        is_exoplanet:
+          type: boolean
+          description: Whether the star is predicted to host an exoplanet
+        probabilities:
+          type: object
+          description: Probabilities for each class
+          additionalProperties:
+            type: number
+    SampleLightCurve:
+      type: object
+      required:
+        - id
+        - label
+        - flux
+        - description
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+          description: "EXOPLANET or NON-EXOPLANET"
+        flux:
+          type: array
+          items:
+            type: number
+        description:
+          type: string
+        star_id:
+          type: ["string", "null"]
+    ModelStatus:
+      type: object
+      required:
+        - ready
+        - message
+      properties:
+        ready:
+          type: boolean
+        message:
+          type: string
+    ApiError:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string

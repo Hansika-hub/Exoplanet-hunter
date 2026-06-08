@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Exoplanet Hunter"
+version = "1.0.0"
+id = "artifacts/exoplanet-hunter"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18590
+
+[services.development]
+run = "pnpm --filter @workspace/exoplanet-hunter run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/exoplanet-hunter", "run", "build" ]
+publicDir = "artifacts/exoplanet-hunter/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18590"
+BASE_PATH = "/"
