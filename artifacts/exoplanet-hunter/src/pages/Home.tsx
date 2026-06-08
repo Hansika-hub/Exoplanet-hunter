@@ -23,8 +23,13 @@ export default function Home() {
     } 
   });
 
+  const isModelReady = modelStatus?.ready === true;
+
   const { data: samples, isLoading: samplesLoading } = useGetSamples({ 
-    query: { queryKey: getGetSamplesQueryKey() } 
+    query: { 
+      queryKey: getGetSamplesQueryKey(),
+      enabled: isModelReady
+    } 
   });
 
   const predict = usePredict();
@@ -50,8 +55,6 @@ export default function Home() {
       }
     );
   };
-
-  const isModelReady = modelStatus?.ready;
 
   return (
     <div className="min-h-screen flex flex-col items-center">
