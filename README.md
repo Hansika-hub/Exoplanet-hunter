@@ -18,3 +18,5 @@ Input: (None, 3197, 1) — a single flux time-series padded/truncated to 3,197 p
 Output: (None, 1) — sigmoid probability; ≥ 0.5 → EXOPLANET, < 0.5 → NON-EXOPLANET
 Normalization: zero-mean, unit-variance applied per sample in Python before inference
 Training data: NASA Kepler stellar flux observations (sample_lightcurves.npz, 570 labeled light curves; label 1 = exoplanet, 0 = non-exoplanet)
+
+Webapp: https://exoplanet-hunter--hansika2108.replit.app
