@@ -107,6 +107,10 @@ components:
         label:
           type: ["string", "null"]
           description: Optional label for the sample (for display purposes)
+        preprocessed:
+          type: boolean
+          default: false
+          description: Set to true when flux is already model_input normalized (preloaded samples). Skips re-normalization in the backend.
     PredictResult:
       type: object
       required:
@@ -146,6 +150,12 @@ components:
           type: array
           items:
             type: number
+          description: Pre-processed model_input flux (for prediction)
+        raw_flux:
+          type: array
+          items:
+            type: number
+          description: Original raw flux values (for chart display)
         description:
           type: string
         star_id:

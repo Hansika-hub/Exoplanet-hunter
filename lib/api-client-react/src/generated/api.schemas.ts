@@ -17,6 +17,8 @@ export interface PredictInput {
      * @nullable
      */
   label?: string | null;
+  /** Set to true when flux is already model_input normalized (preloaded samples). Skips re-normalization in the backend. */
+  preprocessed?: boolean;
 }
 
 /**
@@ -39,7 +41,10 @@ export interface SampleLightCurve {
   id: string;
   /** EXOPLANET or NON-EXOPLANET */
   label: string;
+  /** Pre-processed model_input flux (for prediction) */
   flux: number[];
+  /** Original raw flux values (for chart display) */
+  raw_flux?: number[];
   description: string;
   /** @nullable */
   star_id?: string | null;

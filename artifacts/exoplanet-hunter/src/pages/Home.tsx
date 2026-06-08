@@ -29,11 +29,16 @@ export default function Home() {
 
   const predict = usePredict();
 
-  const handlePredict = (flux: number[], label?: string | null) => {
-    setSelectedFlux(flux);
-    setSelectedLabel(label || null);
+  const handlePredict = (opts: {
+    flux: number[];
+    displayFlux?: number[];
+    label?: string | null;
+    preprocessed?: boolean;
+  }) => {
+    setSelectedFlux(opts.displayFlux ?? opts.flux);
+    setSelectedLabel(opts.label || null);
     predict.mutate(
-      { data: { flux } },
+      { data: { flux: opts.flux, preprocessed: opts.preprocessed ?? false } },
       {
         onError: () => {
           toast({
@@ -88,7 +93,12 @@ export default function Home() {
                           variant="outline"
                           size="sm"
                           disabled={!isModelReady || predict.isPending}
-                          onClick={() => handlePredict(sample.flux, sample.label)}
+                          onClick={() => handlePredict({
+                            flux: sample.flux,
+                            displayFlux: sample.raw_flux ?? sample.flux,
+                            label: sample.label,
+                            preprocessed: true
+                          })}
                           data-testid={`btn-sample-${sample.id}`}
                           className="font-mono"
                         >
@@ -101,7 +111,7 @@ export default function Home() {
 
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Upload</h3>
-                  <Uploader onUpload={(flux) => handlePredict(flux)} disabled={!isModelReady || predict.isPending} />
+                  <Uploader onUpload={(flux) => handlePredict({ flux, preprocessed: false })} disabled={!isModelReady || predict.isPending} />
                 </div>
               </CardContent>
             </Card>

@@ -14,4 +14,6 @@ export interface PredictInput {
      * @nullable
      */
   label?: string | null;
+  /** Set to true when flux is already model_input normalized (preloaded samples). Skips re-normalization in the backend. */
+  preprocessed?: boolean;
 }

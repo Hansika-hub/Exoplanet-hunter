@@ -50,61 +50,42 @@ load_model()
 
 
 def load_samples():
-    """Load sample light curves from the npz file."""
+    """Load sample light curves from the npz file.
+
+    Uses 'model_input' (already pre-processed by the training pipeline) as the
+    flux that gets sent to /predict, and 'raw' for display in the chart.
+    """
     try:
         npz_path = model_setup.paths.get("sample_lightcurves.npz")
         if not npz_path:
             return []
         data = np.load(npz_path)
+
+        raw_array = data["raw"]           # shape (N, 3197) — unnormalized, for display
+        mi_array = data["model_input"]    # shape (N, 3197, 1) — pre-processed, for inference
+        labels_array = data["labels"]     # shape (N,) — 1=exoplanet, 0=non-exoplanet
+
+        print(f"raw shape: {raw_array.shape}", flush=True)
+        print(f"model_input shape: {mi_array.shape}", flush=True)
+        print(f"labels shape: {labels_array.shape}", flush=True)
+
+        n_samples = min(len(raw_array), 10)
         samples = []
-        keys = list(data.keys())
-        # Expected keys: flux arrays and labels
-        # Try to find flux and label arrays
-        flux_key = None
-        labels_key = None
-        for k in keys:
-            kl = k.lower()
-            if "flux" in kl:
-                flux_key = k
-            if "label" in kl or "target" in kl or "y" == kl:
-                labels_key = k
-
-        if flux_key is None:
-            # Try to use first key as flux
-            for k in keys:
-                arr = data[k]
-                if arr.ndim == 2:
-                    flux_key = k
-                    break
-
-        if flux_key is None:
-            print(f"Could not find flux key in npz. Keys: {keys}", flush=True)
-            return []
-
-        flux_array = data[flux_key]
-        print(f"Flux array shape: {flux_array.shape}", flush=True)
-
-        labels_array = None
-        if labels_key:
-            labels_array = data[labels_key]
-            print(f"Labels array shape: {labels_array.shape}", flush=True)
-
-        # Build samples list (max 10)
-        n_samples = min(len(flux_array), 10)
         for i in range(n_samples):
-            flux = flux_array[i].tolist()
-            if labels_array is not None:
-                raw_label = int(labels_array[i]) if labels_array.ndim == 1 else int(labels_array[i][0])
-                # Dataset labels: 1 = exoplanet, 0 = non-exoplanet
-                is_exo = raw_label == 1
-                label = "EXOPLANET" if is_exo else "NON-EXOPLANET"
-            else:
-                label = "UNKNOWN"
-                is_exo = False
+            raw_label = int(labels_array[i])
+            is_exo = raw_label == 1
+            label = "EXOPLANET" if is_exo else "NON-EXOPLANET"
+
+            # flux: the pre-processed model_input (squeezed to 1D) — sent to /predict
+            # raw_flux: the original raw values — used only for chart display
+            mi_flux = mi_array[i, :, 0].tolist()   # squeeze channel dim
+            raw_flux = raw_array[i].tolist()
+
             samples.append({
                 "id": f"sample_{i}",
                 "label": label,
-                "flux": flux,
+                "flux": mi_flux,
+                "raw_flux": raw_flux,
                 "description": f"Kepler light curve {'with transit signal' if is_exo else 'without transit signal'}",
                 "star_id": f"KIC-{1000000 + i}"
             })
@@ -121,6 +102,7 @@ print(f"Loaded {len(SAMPLES)} samples", flush=True)
 class PredictInput(BaseModel):
     flux: list[float]
     label: Optional[str] = None
+    preprocessed: bool = False  # True = already model_input normalized, skip re-normalization
 
 
 @app.get("/health")
@@ -158,13 +140,14 @@ def predict(body: PredictInput):
     elif len(flux) > INPUT_LENGTH:
         flux = flux[:INPUT_LENGTH]
 
-    # Normalize: zero-mean, unit-variance per sample
-    mean = np.mean(flux)
-    std = np.std(flux)
-    if std > 0:
-        flux = (flux - mean) / std
-    else:
-        flux = flux - mean
+    if not body.preprocessed:
+        # Normalize raw flux: zero-mean, unit-variance per sample
+        mean = np.mean(flux)
+        std = np.std(flux)
+        if std > 0:
+            flux = (flux - mean) / std
+        else:
+            flux = flux - mean
 
     # Reshape for CNN: (1, INPUT_LENGTH, 1)
     x = flux.reshape(1, INPUT_LENGTH, 1)

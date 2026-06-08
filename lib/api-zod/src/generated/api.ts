@@ -21,9 +21,12 @@ export const HealthCheckResponse = zod.object({
  * Classify a light curve as exoplanet or non-exoplanet
  * @summary Predict exoplanet
  */
+export const predictBodyPreprocessedDefault = false;
+
 export const PredictBody = zod.object({
   "flux": zod.array(zod.number()).describe('Flux values from the light curve (3197 values expected)'),
-  "label": zod.string().nullish().describe('Optional label for the sample (for display purposes)')
+  "label": zod.string().nullish().describe('Optional label for the sample (for display purposes)'),
+  "preprocessed": zod.boolean().default(predictBodyPreprocessedDefault).describe('Set to true when flux is already model_input normalized (preloaded samples). Skips re-normalization in the backend.')
 })
 
 export const PredictResponse = zod.object({
@@ -41,7 +44,8 @@ export const PredictResponse = zod.object({
 export const GetSamplesResponseItem = zod.object({
   "id": zod.string(),
   "label": zod.string().describe('EXOPLANET or NON-EXOPLANET'),
-  "flux": zod.array(zod.number()),
+  "flux": zod.array(zod.number()).describe('Pre-processed model_input flux (for prediction)'),
+  "raw_flux": zod.array(zod.number()).optional().describe('Original raw flux values (for chart display)'),
   "description": zod.string(),
   "star_id": zod.string().nullish()
 })
