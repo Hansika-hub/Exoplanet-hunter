@@ -116,37 +116,15 @@ export default function Home() {
                         <Progress value={undefined} className="h-1" />
                       </div>
                     ) : predict.data ? (
-                      <div className="text-center w-full space-y-6">
-                        <div className="space-y-2">
+                      <div className="text-center w-full space-y-4">
                           <h2 className={`text-3xl md:text-4xl font-black tracking-tighter ${predict.data.is_exoplanet ? 'text-primary' : 'text-muted-foreground'}`}>
                             {predict.data.is_exoplanet ? 'EXOPLANET DETECTED' : 'NO EXOPLANET'}
                           </h2>
-                          <div className="flex items-center justify-center gap-3">
-                            <Badge variant={predict.data.is_exoplanet ? 'default' : 'secondary'} className="font-mono rounded-none px-3">
-                              CONFIDENCE: {(predict.data.confidence * 100).toFixed(1)}%
+                          {selectedLabel && (
+                            <Badge variant="outline" className="font-mono rounded-none px-3 text-muted-foreground">
+                              TRUE LABEL: {selectedLabel}
                             </Badge>
-                            {selectedLabel && (
-                              <Badge variant="outline" className="font-mono rounded-none px-3 text-muted-foreground">
-                                TRUE LABEL: {selectedLabel}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto pt-4 border-t border-border/50">
-                          <div className="text-left space-y-1">
-                            <span className="text-xs text-muted-foreground font-mono">EXOPLANET PROB</span>
-                            <div className="text-lg font-mono text-primary">
-                              {(predict.data.probabilities['EXOPLANET'] * 100).toFixed(2)}%
-                            </div>
-                          </div>
-                          <div className="text-left space-y-1">
-                            <span className="text-xs text-muted-foreground font-mono">NON-EXO PROB</span>
-                            <div className="text-lg font-mono text-muted-foreground">
-                              {(predict.data.probabilities['NON-EXOPLANET'] * 100).toFixed(2)}%
-                            </div>
-                          </div>
-                        </div>
+                          )}
                       </div>
                     ) : null}
                   </div>
