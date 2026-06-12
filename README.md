@@ -65,8 +65,6 @@ The CNN model achieves **>99% accuracy** on the preprocessed dataset, demonstrat
 
 **Try it now:** [Exoplanet Hunter Web App](https://exoplanet-hunter--hansika2108.replit.app)
 
-![Alt text](./assets/exoplanet1.png)
-![Alt text](./assets/exoplanet2.png)
 ---
 
 *Discovering distant worlds, one light curve at a time. 🌍✨*
