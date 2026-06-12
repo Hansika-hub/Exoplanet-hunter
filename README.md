@@ -67,25 +67,4 @@ The CNN model achieves **>99% accuracy** on the preprocessed dataset, demonstrat
 
 ---
 
-## 📁 Project Structure
-
-```
-Exoplanet-hunter/
-├── python-backend/
-│   └── cnn_exoplanets.keras      # Trained CNN model
-├── sample_lightcurves.npz         # Training dataset
-└── README.md                      # This file
-```
-
----
-
-## 🎯 Key Takeaways
-
-✅ **Automated Detection** - From raw data to exoplanet classification in seconds  
-✅ **High Accuracy** - >99% classification performance  
-✅ **Scalable** - Handles any Kepler format light curve  
-✅ **Interpretable** - Interactive visualizations show detected transit patterns  
-
----
-
 *Discovering distant worlds, one light curve at a time. 🌍✨*
