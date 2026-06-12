@@ -4,7 +4,7 @@ A web app that uses a convolutional neural network (CNN) trained on NASA Kepler 
 
 What it does
 
-Kepler detected exoplanets by watching for tiny, repeating dips in a star's brightness caused by a planet passing in front of it — a method called the transit method. This app runs the same detection logic through a trained CNN:
+Kepler detected exoplanets by watching for tiny, repeating dips in a star's brightness caused by a planet passing in front of it — a method called the transit method. This app runs the same detection logic:
 
 1.Select a preloaded Kepler sample or upload your own .csv light curve file
 2.The CNN analyzes 3,197 flux measurements from the star
@@ -12,6 +12,8 @@ Kepler detected exoplanets by watching for tiny, repeating dips in a star's brig
 4.The light curve is rendered as an interactive chart so you can see the transit dips
 
 CNN model
+
+![CNN Architecture](https://miro.medium.com/max/3288/1*uAeANQIOQPqWZnnuH-VEyw.jpeg)
 
 File: python-backend/cnn_exoplanets.keras
 Input: (None, 3197, 1) — a single flux time-series padded/truncated to 3,197 points
